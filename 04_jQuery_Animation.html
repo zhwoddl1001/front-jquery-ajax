@@ -49,13 +49,18 @@
 
     // 시간 설정 없이 기능만 추가 -> fadeIn 글자 보이는지 확인
     $('#fadeOut').click(function (){
-        $('#box').fadeOut(function (){
+        $('#box').fadeIn(function (){
             $('#box').text("글자가 보입니다.")
           }
        );
+        $('#box').fadeOut(function (){
+                console.log( $('#box').text("글자가 사라졌습니다."))
+            }
+        );
     });
 
     // fadeOut console.log('글자가 사라졌습니다.'); 크롬을 통해 확인
+
 </script>
 </body>
 </html>
