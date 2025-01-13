@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>jQuery_Ajax_people</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<style>
+  body {
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    background-color: #4267b2;
+    color: white;
+    padding: 1em;
+    width: 100%;
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: bold;
+  }
+
+  .profile-container {
+    margin: 20px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .profile-container img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-container h2 {
+    margin: 15px 0 5px;
+    font-size: 1.5em;
+    color: #333;
+  }
+
+  .profile-container p {
+    font-size: 1em;
+    color: #555;
+    margin: 5px 0;
+  }
+
+  .profile-container button {
+    background-color: #4267b2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+  }
+
+  .profile-container button:hover {
+    background-color: #365899;
+  }
+</style>
+<body>
+<header>유저 프로필 조회</header>
+<div class="profile-container" id="profilesContainer">
+</div>
+  <button id="loadProfile">새로운 친구 찾기</button>
+<!--
+<div class="profile-container">
+  <img id="profilePic" src="" alt="프로필 사진">
+  <h2 id="profileName">이름</h2>
+  <h2 id="profileEmail">이메일</h2>
+  <p id="profileLocation">위치</p>
+  <button id="loadProfile">새로운 프로필 보기</button>
+</div>
+-->
+<script>
+    // each 문 활용하기
+   function functionProfile(){
+     $.ajax({
+       url:"https://randomuser.me/api/?results=5",
+       method:"GET",
+     success:
+     function (data){
+            $('#profilesContainer').html("");
+        $.each(data.results,function (index,item) {
+            // each 내부에 <div class="profile-container" id="profilesContainer"> 이미지가 표시되는
+            // div를 .html("") 초기화 하는 작업을 진행하게 되면 반복문을 돌아갈 때마다 기존에 존재하는 데이터를 지우는 행위
+            // 마지막에 최종적으로 1개의 데이터만 보여짐
+            $('#profilesContainer').append(`
+            <div class="profile-container">
+            <img src="${item.picture.large}">
+            <h2>${item.name.first},${item.name.last}</h2>
+            <p>이메일 : ${item.email}</p>
+            <p>지역 : ${item.location.city},${item.location.country}</p>
+            <p>아이디 : ${item.login.uuid}</p>
+            </div>
+            `)
+        })
+     },
+         error:
+             function () {
+                 alert("프로필 데이터를 불러오는데 실패했습니다. 다음에 다시 시도해주세요.")
+       }
+     });
+   }
+
+   // 초기 프로필 불러오기
+  functionProfile();
+   // 버튼 클릭 시 새로운 프로필 불러오기
+   $('#loadProfile').click(function (){
+     functionProfile()
+   })
+
+   /*
+
+                내부에 들어있는 json 데이터
+    { = data 명칭으로 제일먼저 시작하는 중괄호를 가르키고 있음
+    data 중괄호 내부에 존재하는 results = 결과들 중에서 [] = 대괄호 배열, 리스트 표기방식으로 되어있는 유저결과들 중에서
+    data.results[0] = 제일 첫번째로 나와있는 유저정보를 가져오기
+
+    유저 정보데이터 결과들 중에서 제일 첫 번째로 나와있는 값의 성별을 가져오고 싶다.
+    data.results[0].gender = male 데이터 가리킴
+    data.results[0].name.title = Mr 데이터 가리킴
+    data.results[0].name.first = Bruce 데이터 가리킴
+    data.results[0].location.city = Cairns 데이터 가리킴
+    data.results[0].location
+
+  "results": [
+    {
+      "gender": "male",
+      "name": {
+        "title": "Mr",
+        "first": "Felix",
+        "last": "Guzmán"
+      },
+      "location": {
+        "street": {
+          "number": 7519,
+          "name": "Circunvalación Nayarit"
+        },
+        "city": "San Miguel Cuyutlán",
+        "state": "Coahuila",
+        "country": "Mexico",
+        "postcode": 21306,
+        "coordinates": {
+          "latitude": "27.9557",
+          "longitude": "-141.3072"
+        },
+        "timezone": {
+          "offset": "-6:00",
+          "description": "Central Time (US & Canada), Mexico City"
+        }
+      },
+      "email": "felix.guzman@example.com",
+      "login": {
+        "uuid": "463c6b32-71d0-4d90-a905-5d8bcfa941b5",
+        "username": "beautifulfrog428",
+        "password": "marine",
+        "salt": "BhZc3MdN",
+        "md5": "3121735ebb8231a1cf371c6a0f8b2c79",
+        "sha1": "2495b884bbd30b5ddb7ecb3d05f9ab7a29ab4e06",
+        "sha256": "c89ccb354415dd52fd617541d29cb06ab7f8d2d97cbe1732c8cb7111b4e6a756"
+      },
+      "dob": {
+        "date": "1993-05-29T00:54:39.845Z",
+        "age": 31
+      },
+      "registered": {
+        "date": "2012-08-06T13:18:51.552Z",
+        "age": 12
+      },
+      "phone": "(689) 662 0732",
+      "cell": "(674) 687 9632",
+      "id": {
+        "name": "NSS",
+        "value": "93 92 03 7089 5"
+      },
+      "picture": {
+        "large": "https://randomuser.me/api/portraits/men/69.jpg",
+        "medium": "https://randomuser.me/api/portraits/med/men/69.jpg",
+        "thumbnail": "https://randomuser.me/api/portraits/thumb/men/69.jpg"
+      },
+      "nat": "MX"
+    }
+  ],
+  "info": {
+    "seed": "f2c3c15ff83743a4",
+    "results": 1,
+    "page": 1,
+    "version": "1.4"
+  }
+}
+   */
+</script>
+</body>
+</html>
