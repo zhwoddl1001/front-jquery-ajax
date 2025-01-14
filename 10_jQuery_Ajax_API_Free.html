@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+    }
+
+    #loadDigimon {
+        text-align: center;
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    #loadDigimon:hover {
+        background-color: #45a049;
+    }
+
+
+    #DigimonContainer {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    /* 디지몬 정보 스타일 */
+    .Digimoninfo {
+        text-align: center; /* 텍스트 가운데 정렬 */
+    }
+</style>
+<body>
+<h1>정보 가져오기</h1>
+<button id="loadDigimon">디지몬 정보 가져오기</button>
+<div id="DigimonContainer"></div>
+<script>
+    $('#loadDigimon').click(function (){
+        const randomId = Math.floor(Math.random()*10)+1;
+        $.ajax({
+            url:`https://digi-api.com/api/v1/digimon/${randomId}`,
+            method:'GET',
+            success:
+            function (data){
+        const randomSkill = data.skills[Math.floor(Math.random()*data.skills.length)].description
+                $('#DigimonContainer').html(`
+                <div class="Digimoninfo">
+                <img src="${data.images[0].href}">
+                <h2>${data.name}</h2>
+                <h2>${randomSkill}</h2>
+                </div>
+                `)
+            },
+            error:
+            function (){
+                $('#DigimonContainer').html("<p>데이터 불러오기 실패</p>")
+            }
+        })
+    })
+</script>
+</body>
+
+</html>
