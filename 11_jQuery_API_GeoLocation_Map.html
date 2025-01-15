@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title> jQuery Api GeoLocation Map</title>
+    <link href="favicon.ico" rel="icon">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+    <!--
+     unpkg
+     브라우저에서 직접 js, css 라이브러리를 사용할 수 있는 무료 cdn 서비스
+     cdn = https://unpkg.com/leaflet@1.9.4/dist/leaflet.js, https://unpkg.com/leaflet@1.9.4/dist/leaflet.css
+            와 같은 주소로 unpkg 회사에서 만든 js와 css 기능을 주소값으로 가져옴
+     cdn(content delivery network) 서비스를 사용하지 않을 경우
+          위 주소로 접속하여 오른쪽 마우스를 클릭하고, 다른 이름으로 저장한 다음에 파일을 가져와서 경로 설정
+     https://unpkg.com/leaflet@1.9.4/   https://unpkg.com/leaflet{@version} @1.9.4 생략 가능하나 작성하는 것이 좋음
+     버전을 작성하지 않을 경우 최신버전으로 사용되지만 버전을 작성해주는 것이 파일 가져오는 속도 빠름
+
+     -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: aliceblue;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .container h1 {
+            color: #333;
+        }
+
+        .container button {
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .container button:hover {
+            background-color: #0056b3;
+        }
+
+        .container #map {
+            height: 500px;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>내 위치를 지도에서 확인하세요.</h1>
+    <button id="findMe">내 위치 보기</button>
+    <div id="map"></div>
+</div>
+<script>
+    let map; // 초기에는 지도에 표시할 위치가 없기 때문에 위도 = 경도 = 0 모두 0값으로 초기화
+
+    // locationInfo 를 클릭하거나 자동 실행을 요청할 때 map에 나의 위치를 담을 수 있도록 설정
+    function locationInfo() {
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+
+                    // 눈으로 보이는 지도를 만들어 그림처럼 위치 확인
+                    // unpkg 회사에서 만든 loeflet = 지도 기능의 앞글자인  L을 대문자로 표기해서 unpkg 를 활용
+                    // 지도에 .setting 하겠다. view 화면을 ([위도, 경도], 지도 중심 줌 레벨 13 으로 지정
+                    // zoom = 줌 = 숫자가 낮을 수록 건물이나 도로가 작게 보이고 주변에 보이는 것이 커짐
+                    //             숫자가   클 수록 건물이나 도로가 크게 보이고 주변에 보이는 것이 작아짐
+                    if (!map) {
+                        map = L.map('map') // Leaflet.js 를 사용해서 <div id="map"> 요소에 지도를 생성하고, #은 생략
+                            .setView([lat, lng], 19); // 지도 중심을 위도와 경도 기준으로 설정 숫자가 클수록 건물이 크게 보임 더 확대된 상태
+                        L
+                        .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', // 지도 타일을 실행하는 기능
+                            //{z} = 줌 {x} = 위도 {y} = 경도 {s} = 도메인 www 회사에서 변경한 형식으로 사용
+                            {
+                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                // 지도 데이터를 제공한 출처 표시 OpenStreetMap 출처 링크 남기도록 권함 attribution 생략해도 되지만
+                                // 작성하는 것이 안전함
+                            }).addTo(map); // 생성된 타일 레이어를 map 객체에 추가
+                        // 마커 추가
+                        // 위도 경도   [위도, 경도]
+                        L.marker([lat, lng]) // 위도, 경도에 마커(핀)을 생성
+                            .addTo(map)      // map = 지도 컨테이너 앞에서 생성한 지도 map 에 마커를 추가
+                            .bindPopup('여기에 존재합니다.') // 마커를 클릭하면 표기될 팝업 창의 내용을 설정
+                            .openPopup();                 // bindPopup 창을 자동으로 열도록 설정 () 안에 어떤값도 작성하지 않음
+                    /*
+                        // 내 위치 정보를 화면에 표기
+                        $("#map").html(`
+
+                                <p>위도 : ${lat}</p>
+                                <p>경도 : ${lng}</p>
+                                <p>위치 정보를 확인했습니다.</p>
+                              `)*/
+                    } else {
+                        alert('브라우저에서 위치 서비스를 지원하지 않습니다. ')
+                    }
+                },
+                function () {
+                    alert('위치를 가져올 수 없습니다.');
+                }
+            )
+        }
+    }
+
+    $('#findMe').click(
+        function () {
+            locationInfo();
+        }
+    )
+
+    /*
+    * 위치 확인
+    *       위도 :  latitude
+    *       경도 :  longitude
+    *
+    *
+    * */
+</script>
+</body>
+</html>
